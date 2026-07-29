@@ -16,6 +16,23 @@ from app.schemas.document import DocumentResponse
 from app.services.document_service import create_document
 from app.utils.security import admin_required
 
+from app.services.parser_service import (
+    extract_pdf_text,
+    extract_docx_text,
+)
+
+from app.services.langchain_chunk_service import (
+    chunk_text_langchain,
+)
+
+from app.services.embedding_service import (
+    create_embeddings,
+)
+
+from app.services.vector_service import (
+    store_embeddings,
+)
+
 router = APIRouter(
     prefix="/documents",
     tags=["Documents"]
@@ -55,6 +72,21 @@ def upload_document(
 
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
+
+    # Extract text
+    if extension == ".pdf":
+        text = extract_pdf_text(file_path)
+    else:
+        text = extract_docx_text(file_path)
+
+# Create chunks
+    chunks = chunk_text_langchain(text)
+
+# Generate embeddings
+    embeddings = create_embeddings(chunks)
+
+# Store in ChromaDB
+    store_embeddings(chunks, embeddings)
 
     document = create_document(
         db=db,
