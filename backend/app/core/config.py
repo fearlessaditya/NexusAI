@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     HOST: str
     PORT: int
 
+    GROQ_API_KEY: str
+
     DATABASE_URL: str
     SECRET_KEY: str
     ALGORITHM: str

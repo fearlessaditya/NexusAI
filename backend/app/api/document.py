@@ -86,7 +86,13 @@ def upload_document(
     embeddings = create_embeddings(chunks)
 
 # Store in ChromaDB
-    store_embeddings(chunks, embeddings)
+    # Store in ChromaDB
+    store_embeddings(
+        chunks=chunks,
+        embeddings=embeddings,
+        filename=file.filename,
+        uploaded_by=current_user.email,
+)
 
     document = create_document(
         db=db,
