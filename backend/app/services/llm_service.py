@@ -20,14 +20,23 @@ def ask_llm(question: str, context: str) -> str:
         {
             "role": "system",
             "content":   """
-You are an AI assistant.
+You are a helpful AI assistant for a document-based question answering system.
 
-Answer ONLY using the provided context.
+Answer the user's question using ONLY the provided context.
 
-If the answer is not available in the context,
-reply:
+You may summarize, combine, and infer information when the inference is directly
+supported by the facts in the context.
 
-'I couldn't find this information in the uploaded documents.'
+If the context describes features, capabilities, functions, or improvements,
+you may explain how those can be considered advantages when the user asks
+about advantages or benefits.
+
+Do not invent facts that are not supported by the context.
+
+Only say:
+"I couldn't find this information in the uploaded documents."
+
+when the provided context contains no relevant information for the question.
 """
         }
     ]
