@@ -1,4 +1,5 @@
 import chromadb
+import uuid
 
 # Create Chroma client
 client = chromadb.PersistentClient(path="chroma_db")
@@ -16,7 +17,8 @@ def store_embeddings(
     uploaded_by: str,
 ):
 
-    ids = [f"chunk_{i}" for i in range(len(chunks))]
+   # ids = [f"{uuid.uuid4()}_chunk_{i}" for i in range(len(chunks))]
+    ids = [f"{uuid.uuid4()}_chunk_{i}" for i in range(len(chunks))]
 
     metadatas = [
         {
