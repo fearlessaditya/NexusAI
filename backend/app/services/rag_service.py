@@ -1,12 +1,11 @@
-from app.services.search_service import search_documents
+from app.services.search_service import hybrid_search
 from app.services.llm_service import ask_llm
-#from app.services.memory_service import get_last_user_message
 from app.services.query_rewriter import rewrite_query
+
 
 def ask_question(question: str):
 
-   
-# Rewrite question using conversation history
+    # Rewrite question using conversation history
     search_query = rewrite_query(question)
 
     print("=" * 60)
@@ -14,27 +13,38 @@ def ask_question(question: str):
     print("Rewritten Query   :", search_query)
     print("=" * 60)
 
-    # ===== DEBUG START =====
-    '''
-    print("=" * 50)
-    print("Previous Question :", previous_question)
-    print("Current Question  :", question)
-    print("Search Query      :", search_query)
-    print("=" * 50)
-    # ===== DEBUG END =====
-    '''
-    # Search relevant chunks
-    results = search_documents(search_query)
+    # Search relevant chunks using hybrid search
+    results = hybrid_search(
+        search_query,
+        top_k=3,
+    )
 
     # ===== DEBUG START =====
     print("\nRetrieved Documents:")
-    for i, doc in enumerate(results["documents"][0], start=1):
+
+    for i, item in enumerate(results, start=1):
+
         print(f"\nChunk {i}:")
-        print(doc[:200], "...")
+        print(item["document"][:200], "...")
+
+        print(
+            "Hybrid Score:",
+            round(item["hybrid_score"], 3)
+        )
+
     # ===== DEBUG END =====
 
-    documents = results["documents"][0]
-    metadatas = results["metadatas"][0]
+    # Extract documents
+    documents = [
+        item["document"]
+        for item in results
+    ]
+
+    # Extract metadata
+    metadatas = [
+        item["metadata"]
+        for item in results
+    ]
 
     # Merge context
     context = "\n\n".join(documents)
@@ -57,6 +67,7 @@ def ask_question(question: str):
         )
 
         if key not in seen:
+
             seen.add(key)
 
             sources.append(
