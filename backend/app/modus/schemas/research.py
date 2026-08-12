@@ -29,3 +29,31 @@ class ResearchResponse(BaseModel):
     answer: str
     findings: ResearchAnalysis
     sources: list[ResearchSource]
+    evidence: list[ResearchEvidence]
+    comparison: ResearchComparison
+    conclusion: ResearchConclusion
+
+class ResearchEvidence(BaseModel):
+    claim: str
+    evidence: str
+    source_index: int
+    source: ResearchSource
+
+class Contradiction(BaseModel):
+    claim_a: str
+    claim_b: str
+    explanation: str
+    source_a: int
+    source_b: int
+
+
+class ResearchComparison(BaseModel):
+    agreements: list[str]
+    disagreements: list[str]
+    contradictions: list[Contradiction]
+
+class ResearchConclusion(BaseModel):
+    conclusion: str
+    confidence: str
+    key_takeaways: list[str]
+    caveats: list[str]
