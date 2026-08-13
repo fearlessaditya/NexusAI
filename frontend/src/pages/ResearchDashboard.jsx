@@ -16,12 +16,9 @@ function ResearchDashboard() {
 
     try {
       const data = await runResearch(question, 5);
-
       setResult(data);
     } catch (err) {
-      setError(
-        err.message || "Unable to complete research."
-      );
+      setError(err.message || "Unable to complete research.");
     } finally {
       setLoading(false);
     }
@@ -29,6 +26,7 @@ function ResearchDashboard() {
 
   return (
     <div className="app">
+      {/* HEADER */}
       <header className="header">
         <div>
           <div className="brand">MODUS</div>
@@ -44,12 +42,9 @@ function ResearchDashboard() {
       </header>
 
       <main className="dashboard">
-
         {/* HERO */}
         <section className="hero">
-          <div className="eyebrow">
-            AI RESEARCH AGENT
-          </div>
+          <div className="eyebrow">AI RESEARCH AGENT</div>
 
           <h1>
             Turn documents into
@@ -63,49 +58,73 @@ function ResearchDashboard() {
           </p>
         </section>
 
-        {/* RESEARCH INPUT */}
+        {/* QUESTION */}
         <section className="research-box">
           <label>Research Question</label>
 
           <textarea
             value={question}
-            onChange={(event) =>
-              setQuestion(event.target.value)
-            }
+            onChange={(event) => setQuestion(event.target.value)}
             placeholder="Ask something about your uploaded documents..."
             rows={5}
             disabled={loading}
           />
 
           <div className="research-actions">
-            <span>
-              Evidence-based research
-            </span>
+            <span>Evidence-based research</span>
 
             <button
               onClick={handleResearch}
               disabled={loading || !question.trim()}
             >
-              {loading
-                ? "Researching..."
-                : "Run Research →"}
+              {loading ? "Researching..." : "Run Research →"}
             </button>
           </div>
         </section>
 
+        {/* LOADING */}
+        {loading && (
+          <section className="research-progress">
+            <div className="section-title">Research Pipeline</div>
+
+            <div className="progress-grid">
+              <div className="progress-card active">
+                <span>01</span>
+                <strong>Retrieve</strong>
+                <p>Searching relevant evidence...</p>
+              </div>
+
+              <div className="progress-card active">
+                <span>02</span>
+                <strong>Analyze</strong>
+                <p>Extracting research findings...</p>
+              </div>
+
+              <div className="progress-card active">
+                <span>03</span>
+                <strong>Compare</strong>
+                <p>Comparing retrieved evidence...</p>
+              </div>
+
+              <div className="progress-card active">
+                <span>04</span>
+                <strong>Synthesize</strong>
+                <p>Generating final conclusion...</p>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* ERROR */}
         {error && (
           <section className="result-section error-box">
-            <div className="section-title">
-              Research Error
-            </div>
-
+            <div className="section-title">Research Error</div>
             <p>{error}</p>
           </section>
         )}
 
-        {/* RESULT */}
-        {result && (
+        {/* RESULTS */}
+        {result && !loading && (
           <section className="results">
 
             {/* ANSWER */}
@@ -127,49 +146,48 @@ function ResearchDashboard() {
                 </div>
 
                 <div className="conclusion-card">
-                  <div className="confidence">
-                    Confidence:{" "}
-                    <strong>
-                      {result.conclusion.confidence}
-                    </strong>
+                  <div className="conclusion-header">
+                    <span>Confidence</span>
+
+                    <span
+                      className={`confidence confidence-${String(
+                        result.conclusion.confidence || ""
+                      ).toLowerCase()}`}
+                    >
+                      {result.conclusion.confidence || "Unknown"}
+                    </span>
                   </div>
 
                   <h2>
                     {result.conclusion.conclusion}
                   </h2>
 
-                  {result.conclusion.key_takeaways
-                    ?.length > 0 && (
-                    <>
+                  {result.conclusion.key_takeaways?.length > 0 && (
+                    <div className="subsection">
                       <h3>Key Takeaways</h3>
 
                       <ul>
                         {result.conclusion.key_takeaways.map(
                           (item, index) => (
-                            <li key={index}>
-                              {item}
-                            </li>
+                            <li key={index}>{item}</li>
                           )
                         )}
                       </ul>
-                    </>
+                    </div>
                   )}
 
-                  {result.conclusion.caveats
-                    ?.length > 0 && (
-                    <>
+                  {result.conclusion.caveats?.length > 0 && (
+                    <div className="subsection">
                       <h3>Caveats</h3>
 
                       <ul>
                         {result.conclusion.caveats.map(
                           (item, index) => (
-                            <li key={index}>
-                              {item}
-                            </li>
+                            <li key={index}>{item}</li>
                           )
                         )}
                       </ul>
-                    </>
+                    </div>
                   )}
                 </div>
               </div>
@@ -182,44 +200,49 @@ function ResearchDashboard() {
                   Research Findings
                 </div>
 
+                {result.findings.summary && (
+                  <div className="findings-summary">
+                    <strong>Summary</strong>
+                    <p>{result.findings.summary}</p>
+                  </div>
+                )}
+
                 <div className="findings-grid">
-                  {Array.isArray(result.findings)
-                    ? result.findings.map(
-                        (finding, index) => (
-                          <div
-                            className="finding-card"
-                            key={index}
-                          >
-                            <div className="card-number">
-                              Finding {index + 1}
-                            </div>
+                  {result.findings.findings?.map(
+                    (finding, index) => (
+                      <div
+                        className="finding-card"
+                        key={index}
+                      >
+                        <div className="card-number">
+                          FINDING {String(index + 1).padStart(2, "0")}
+                        </div>
 
-                            <h3>
-                              {finding.claim ||
-                                finding.title ||
-                                "Research Finding"}
-                            </h3>
+                        <h3>{finding.claim}</h3>
 
-                            <p>
-                              {finding.evidence ||
-                                finding.description ||
-                                ""}
-                            </p>
-                          </div>
-                        )
-                      )
-                    : (
-                      <div className="finding-card">
-                        <pre>
-                          {JSON.stringify(
-                            result.findings,
-                            null,
-                            2
-                          )}
-                        </pre>
+                        <p>{finding.evidence}</p>
+
+                        <div className="finding-source">
+                          Source #{finding.source_index}
+                        </div>
                       </div>
-                    )}
+                    )
+                  )}
                 </div>
+
+                {result.findings.limitations?.length > 0 && (
+                  <div className="limitations-card">
+                    <h3>Limitations</h3>
+
+                    <ul>
+                      {result.findings.limitations.map(
+                        (item, index) => (
+                          <li key={index}>{item}</li>
+                        )
+                      )}
+                    </ul>
+                  </div>
+                )}
               </div>
             )}
 
@@ -231,45 +254,49 @@ function ResearchDashboard() {
                 </div>
 
                 <div className="evidence-list">
-                  {result.evidence.map(
-                    (item, index) => (
-                      <div
-                        className="evidence-card"
-                        key={index}
-                      >
-                        <div className="evidence-header">
-                          <span>
-                            Evidence {index + 1}
-                          </span>
+                  {result.evidence.map((item, index) => (
+                    <div
+                      className="evidence-card"
+                      key={index}
+                    >
+                      <div className="evidence-header">
+                        <span>
+                          EVIDENCE{" "}
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
 
-                          <span>
-                            Source #{item.source_index}
-                          </span>
-                        </div>
-
-                        <h3>
-                          {item.claim}
-                        </h3>
-
-                        <p>
-                          {item.evidence}
-                        </p>
-
-                        <div className="source-meta">
-                          <strong>Source</strong>
-
-                          <pre>
-                            {JSON.stringify(
-                              item.source?.metadata ||
-                                {},
-                              null,
-                              2
-                            )}
-                          </pre>
-                        </div>
+                        <span>
+                          Source #{item.source_index}
+                        </span>
                       </div>
-                    )
-                  )}
+
+                      <h3>{item.claim}</h3>
+
+                      <p>{item.evidence}</p>
+
+                      <div className="evidence-source">
+                        <strong>
+                          {item.source?.metadata?.filename ||
+                            "Unknown document"}
+                        </strong>
+
+                        {item.source?.metadata?.uploaded_by && (
+                          <span>
+                            Uploaded by{" "}
+                            {item.source.metadata.uploaded_by}
+                          </span>
+                        )}
+
+                        {item.source?.hybrid_score !== null &&
+                          item.source?.hybrid_score !== undefined && (
+                            <span>
+                              Hybrid Score:{" "}
+                              {item.source.hybrid_score.toFixed(3)}
+                            </span>
+                          )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
@@ -284,16 +311,15 @@ function ResearchDashboard() {
                 <div className="comparison-grid">
 
                   <div className="comparison-card">
-                    <h3>Agreements</h3>
+                    <div className="comparison-label">
+                      AGREEMENTS
+                    </div>
 
-                    {result.comparison.agreements
-                      ?.length > 0 ? (
+                    {result.comparison.agreements?.length > 0 ? (
                       <ul>
                         {result.comparison.agreements.map(
                           (item, index) => (
-                            <li key={index}>
-                              {item}
-                            </li>
+                            <li key={index}>{item}</li>
                           )
                         )}
                       </ul>
@@ -303,16 +329,15 @@ function ResearchDashboard() {
                   </div>
 
                   <div className="comparison-card">
-                    <h3>Disagreements</h3>
+                    <div className="comparison-label">
+                      DISAGREEMENTS
+                    </div>
 
-                    {result.comparison.disagreements
-                      ?.length > 0 ? (
+                    {result.comparison.disagreements?.length > 0 ? (
                       <ul>
                         {result.comparison.disagreements.map(
                           (item, index) => (
-                            <li key={index}>
-                              {item}
-                            </li>
+                            <li key={index}>{item}</li>
                           )
                         )}
                       </ul>
@@ -320,21 +345,19 @@ function ResearchDashboard() {
                       <p>No disagreements identified.</p>
                     )}
                   </div>
-
                 </div>
 
                 {/* CONTRADICTIONS */}
-                {result.comparison.contradictions
-                  ?.length > 0 && (
-                  <div className="contradictions">
-                    <h3>
-                      ⚠ Contradictions
-                    </h3>
+                <div className="contradictions-card">
+                  <div className="comparison-label">
+                    CONTRADICTIONS
+                  </div>
 
-                    {result.comparison.contradictions.map(
+                  {result.comparison.contradictions?.length > 0 ? (
+                    result.comparison.contradictions.map(
                       (item, index) => (
                         <div
-                          className="contradiction-card"
+                          className="contradiction"
                           key={index}
                         >
                           <strong>
@@ -357,9 +380,13 @@ function ResearchDashboard() {
                           </p>
                         </div>
                       )
-                    )}
-                  </div>
-                )}
+                    )
+                  ) : (
+                    <div className="no-contradictions">
+                      ✓ No contradictions detected
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
@@ -371,51 +398,53 @@ function ResearchDashboard() {
                 </div>
 
                 <div className="sources-list">
-                  {result.sources.map(
-                    (source, index) => (
-                      <div
-                        className="source-card"
-                        key={index}
-                      >
-                        <div className="source-number">
-                          Source {index + 1}
-                        </div>
-
-                        <p>
-                          {source.document}
-                        </p>
-
-                        <small>
-                          Hybrid Score:{" "}
-                          {source.hybrid_score !==
-                          null &&
-                          source.hybrid_score !==
-                          undefined
-                            ? source.hybrid_score.toFixed(
-                                3
-                              )
-                            : "N/A"}
-                        </small>
+                  {result.sources.map((source, index) => (
+                    <div
+                      className="source-card"
+                      key={index}
+                    >
+                      <div className="source-number">
+                        SOURCE {String(index + 1).padStart(2, "0")}
                       </div>
-                    )
-                  )}
+
+                      <h3>
+                        {source.metadata?.filename ||
+                          "Unknown document"}
+                      </h3>
+
+                      <p>{source.document}</p>
+
+                      <div className="source-footer">
+                        <span>
+                          Uploaded by:{" "}
+                          {source.metadata?.uploaded_by ||
+                            "Unknown"}
+                        </span>
+
+                        <span>
+                          Hybrid Score:{" "}
+                          {source.hybrid_score !== null &&
+                          source.hybrid_score !== undefined
+                            ? source.hybrid_score.toFixed(3)
+                            : "N/A"}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
-
           </section>
         )}
 
-        {/* PIPELINE */}
-        {!result && !loading && (
+        {/* EMPTY STATE */}
+        {!result && !loading && !error && (
           <section className="pipeline">
-
             <div className="section-title">
               Research Pipeline
             </div>
 
             <div className="pipeline-grid">
-
               <div className="pipeline-card">
                 <div className="number">01</div>
                 <h3>Retrieve</h3>
@@ -455,11 +484,9 @@ function ResearchDashboard() {
                   Generate an evidence-based conclusion.
                 </p>
               </div>
-
             </div>
           </section>
         )}
-
       </main>
     </div>
   );
