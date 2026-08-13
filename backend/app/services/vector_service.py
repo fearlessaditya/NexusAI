@@ -49,3 +49,14 @@ def search_similar(query_embedding, top_k=3):
     )
 
     return results
+
+def get_all_documents():
+
+    results = collection.get(
+        include=[
+            "documents",
+            "metadatas",
+        ],
+    )
+
+    return results
