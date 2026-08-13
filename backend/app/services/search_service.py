@@ -218,10 +218,13 @@ def hybrid_search(
         vector_score = vector_score / max_vector_score
 
         # Normalize keyword score
-        keyword_score = (
+        if max_keyword_score > 0:
+            keyword_score = (
             item["keyword_score"]
             / max_keyword_score
         )
+        else:
+            keyword_score = 0
 
         # Final hybrid score
         item["hybrid_score"] = (
